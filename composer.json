@@ -1,0 +1,13 @@
+{
+    "autoload": {
+        "psr-4": {
+            "PhpApi\\": "src/"
+        }
+    },
+    "require": {
+        "vlucas/phpdotenv": "^5.4"
+    },
+    "scripts": {
+        "seed": "php scripts/seed.php"
+    }
+}
