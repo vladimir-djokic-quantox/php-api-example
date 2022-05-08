@@ -2,14 +2,16 @@
 
 require_once "src/bootstrap.php";
 
+use PhpApi\Db\DbConnector;
+
 $sql = <<<EOS
 
 DROP TABLE IF EXISTS person;
 
 CREATE TABLE IF NOT EXISTS person (
-	id INT NOT NULL AUTO_INCREMENT,
-	first_name VARCHAR(50) NOT NULL,
-	last_name VARCHAR(50) NOT NULL,
+    id INT NOT NULL AUTO_INCREMENT,
+    first_name VARCHAR(50) NOT NULL,
+    last_name VARCHAR(50) NOT NULL,
     PRIMARY KEY (id)
 );
 
@@ -27,8 +29,8 @@ INSERT INTO person (first_name, last_name) VALUES ('Nadiya', 'Cruickshank');
 EOS;
 
 try {
-	$dbConnection->exec($sql);
-	echo "Seeding done!\n";
+    DbConnector::getConnection()->exec($sql);
+    echo "Seeding done!\n";
 } catch (\PDOException $e) {
-	exit($e->getMessage());
+    exit($e->getMessage());
 }
