@@ -9,7 +9,7 @@ class DbConnector {
     private static $connection = null;
 
     public static function getConnection() {
-        if (!DbConnector::$connection) {
+        if (!self::$connection) {
             $host = $_ENV["DB_HOST"];
             $port = $_ENV["DB_PORT"];
             $db = $_ENV["DB_NAME"];
