@@ -8,6 +8,7 @@
         "vlucas/phpdotenv": "^5.4"
     },
     "scripts": {
-        "seed": "php scripts/seed.php"
+        "seed": "php scripts/seed.php",
+        "start": "php -S 127.0.0.1:3000 public/index.php"
     }
 }
