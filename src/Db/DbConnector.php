@@ -6,10 +6,10 @@ use \PDO;
 use \PDOException;
 
 class DbConnector {
-    private static ?PDO $connection = null;
+    private static $connection = null;
 
     public static function getConnection() {
-        if (DbConnector::$connection === null) {
+        if (!DbConnector::$connection) {
             $host = $_ENV["DB_HOST"];
             $port = $_ENV["DB_PORT"];
             $db = $_ENV["DB_NAME"];
@@ -17,7 +17,7 @@ class DbConnector {
             $pass = $_ENV["DB_PASSWORD"];
 
             try {
-                return new PDO(
+                self::$connection = new PDO(
                     "mysql:host=$host;port=$port;dbname=$db",
                     $user,
                     $pass
@@ -27,6 +27,6 @@ class DbConnector {
             }
         }
 
-        return DbConnector::$connection;
+        return self::$connection;
     }
 }

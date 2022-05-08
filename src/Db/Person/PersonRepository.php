@@ -52,16 +52,14 @@ class PersonRepository {
         $sql = "INSERT INTO person (first_name, last_name) VALUES(:first_name, :last_name)";
 
         try {
-            $connection = DbConnector::getConnection();
-
-            $query = $connection->prepare($sql);
+            $query = DbConnector::getConnection()->prepare($sql);
             $query->execute([
                 "first_name" => $payload->firstName,
                 "last_name" => $payload->lastName
             ]);
             
             return new Person(
-                $connection->lastInsertId(),
+                DbConnector::getConnection()->lastInsertId(),
                 $payload->firstName,
                 $payload->lastName
             );
