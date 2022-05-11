@@ -14,6 +14,11 @@ class PersonController {
                     $this->getAllResponse();
                 break;
 
+            case "POST":
+            case "PUT":
+            case "DELETE":
+                break;
+
             default:
                 $this->notFoundResponse();
         }

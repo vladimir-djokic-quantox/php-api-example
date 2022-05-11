@@ -3,8 +3,8 @@
 namespace PhpApi\Db\Person;
 
 class PersonPayload {
-    public ?string $firstName = null;
-    public ?string $lastName = null;
+    public string $firstName;
+    public string $lastName;
 
     public function __construct(string $firstName, string $lastName) {
         $this->firstName = $firstName;

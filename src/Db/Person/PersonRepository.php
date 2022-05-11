@@ -4,20 +4,20 @@ namespace PhpApi\Db\Person;
 
 use \PDO;
 use \PDOException;
-use PhpApi\Db\DbConnector;
+use PhpApi\Db\Database;
 
 class PersonRepository {
     public static function getAll() {
-        $sql = "SELECT id, first_name, last_name FROM person";
+        $sql = "SELECT person_id, first_name, last_name FROM person";
 
         try {
-            $query = DbConnector::getConnection()->query($sql);
+            $query = (new Database())->getConnection()->query($sql);
             $result = $query->fetchAll(PDO::FETCH_ASSOC);
 
             return array_map(
                 function ($r) {
                     return new Person(
-                        intval($r["id"]),
+                        intval($r["person_id"]),
                         $r["first_name"],
                         $r["last_name"]
                     );
@@ -25,20 +25,20 @@ class PersonRepository {
                 $result
             );
         } catch (PDOException $e) {
-            exit($e->getMessage());
+            exit($e->getMessage().PHP_EOL);
         }
     }
 
-    public static function getById(int $id) {
-        $sql = "SELECT id, first_name, last_name FROM person WHERE id = ?";
+    public static function getById(int $personId) {
+        $sql = "SELECT person_id, first_name, last_name FROM person WHERE person_id = :person_id";
 
         try {
-            $query = DbConnector::getConnection()->prepare($sql);
-            $query->execute([$id]);
+            $query = (new Database())->getConnection()->prepare($sql);
+            $query->execute(["person_id" => $personId]);
             $result = $query->fetchAll(PDO::FETCH_ASSOC);
 
             return new Person(
-                intval($result[0]["id"]),
+                intval($result[0]["person_id"]),
                 $result[0]["first_name"],
                 $result[0]["last_name"]
             );
@@ -52,47 +52,49 @@ class PersonRepository {
         $sql = "INSERT INTO person (first_name, last_name) VALUES(:first_name, :last_name)";
 
         try {
-            $query = DbConnector::getConnection()->prepare($sql);
+            $dbConnection = (new Database())->getConnection();
+
+            $query = $dbConnection->prepare($sql);
             $query->execute([
                 "first_name" => $payload->firstName,
                 "last_name" => $payload->lastName
             ]);
             
             return new Person(
-                DbConnector::getConnection()->lastInsertId(),
+                $dbConnection->lastInsertId(),
                 $payload->firstName,
                 $payload->lastName
             );
         } catch (PDOException $e) {
-            exit($e->getMessage());
+            exit($e->getMessage().PHP_EOL);
         }
     }
 
     public static function update(Person $person) {
-        $sql = "UPDATE person SET first_name = :first_name, last_name = :last_name WHERE id = :id";
+        $sql = "UPDATE person SET first_name = :first_name, last_name = :last_name WHERE person_id = :person_id";
 
         try {
-            $query = DbConnector::getConnection()->prepare($sql);
+            $query = (new Database())->getConnection()->prepare($sql);
             $query->execute([
-                "id" => $person->id,
+                "person_id" => $person->id,
                 "first_name" => $person->firstName,
                 "last_name" => $person->lastName
             ]);
 
             return $person;
         } catch (PDOException $e) {
-            exit($e->getMessage());
+            exit($e->getMessage().PHP_EOL);
         }
     }
 
-    public static function delete(int $id) {
-        $sql = "DELETE FROM person WHERE id = :id";
+    public static function delete(int $personId) {
+        $sql = "DELETE FROM person WHERE person_id = :person_id";
 
         try {
-            $query = DbConnector::getConnection()->prepare($sql);
-            $query->execute(["id" => $id]);
+            $query = (new Database())->getConnection()->prepare($sql);
+            $query->execute(["person_id" => $personId]);
         } catch (PDOException $e) {
-            exit($e->getMessage());
+            exit($e->getMessage().PHP_EOL);
         }
     }
 }
