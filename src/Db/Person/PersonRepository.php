@@ -4,14 +4,21 @@ namespace PhpApi\Db\Person;
 
 use \PDO;
 use \PDOException;
-use PhpApi\Db\Database;
+use PhpApi\Model\Person\PersonPayload;
+use PhpApi\Model\Person\Person;
 
 class PersonRepository {
-    public static function getAll() {
+    private PDO $connection;
+
+    public function __construct($connection) {
+        $this->connection = $connection;
+    }
+
+    public function getAll() {
         $sql = "SELECT person_id, first_name, last_name FROM person";
 
         try {
-            $query = (new Database())->getConnection()->query($sql);
+            $query = $this->connection->query($sql);
             $result = $query->fetchAll(PDO::FETCH_ASSOC);
 
             return array_map(
@@ -29,11 +36,12 @@ class PersonRepository {
         }
     }
 
-    public static function getById(int $personId) {
+    public function getById(int $personId) {
         $sql = "SELECT person_id, first_name, last_name FROM person WHERE person_id = :person_id";
 
         try {
-            $query = (new Database())->getConnection()->prepare($sql);
+            $query = $this->connection->prepare($sql);
+
             $query->execute(["person_id" => $personId]);
             $result = $query->fetchAll(PDO::FETCH_ASSOC);
 
@@ -48,20 +56,19 @@ class PersonRepository {
 
     }
 
-    public static function insert(PersonPayload $payload) {
+    public function insert(PersonPayload $payload) {
         $sql = "INSERT INTO person (first_name, last_name) VALUES(:first_name, :last_name)";
 
         try {
-            $dbConnection = (new Database())->getConnection();
+            $query = $this->connection->prepare($sql);
 
-            $query = $dbConnection->prepare($sql);
             $query->execute([
                 "first_name" => $payload->firstName,
                 "last_name" => $payload->lastName
             ]);
             
             return new Person(
-                $dbConnection->lastInsertId(),
+                $this->connection->lastInsertId(),
                 $payload->firstName,
                 $payload->lastName
             );
@@ -70,11 +77,12 @@ class PersonRepository {
         }
     }
 
-    public static function update(Person $person) {
+    public function update(Person $person) {
         $sql = "UPDATE person SET first_name = :first_name, last_name = :last_name WHERE person_id = :person_id";
 
         try {
-            $query = (new Database())->getConnection()->prepare($sql);
+            $query = $this->connection->prepare($sql);
+
             $query->execute([
                 "person_id" => $person->id,
                 "first_name" => $person->firstName,
@@ -87,11 +95,11 @@ class PersonRepository {
         }
     }
 
-    public static function delete(int $personId) {
+    public function delete(int $personId) {
         $sql = "DELETE FROM person WHERE person_id = :person_id";
 
         try {
-            $query = (new Database())->getConnection()->prepare($sql);
+            $query = $this->connection->prepare($sql);
             $query->execute(["person_id" => $personId]);
         } catch (PDOException $e) {
             exit($e->getMessage().PHP_EOL);

@@ -2,6 +2,7 @@
 
 require_once "src/bootstrap.php";
 
+use PhpApi\Db\Database;
 use PhpApi\Api\PersonController;
 
 header("Access-Control-Allow-Origin: *");
@@ -20,18 +21,22 @@ if ($uri[1] !== 'api') {
 
 $requestMethod = $_SERVER["REQUEST_METHOD"];
 
-function callPersonController($requestMethod, $uri) {
+function execPersonController($requestMethod, $uri): void {
     $personId = null;
     
-    if (isset($uri[3]))
+    if (is_numeric($uri[3]))
         $personId = intval($uri[3]);
 
-    (new PersonController())->exec($requestMethod, $personId);
+    $db = new Database();
+    $connection = $db->getConnection();
+
+    $controller = new PersonController($connection);
+    $controller->exec($requestMethod, $personId);
 }
 
 switch ($uri[2]) {
     case "person":
-        callPersonController($requestMethod, $uri);
+        execPersonController($requestMethod, $uri);
         break;
 
     default:

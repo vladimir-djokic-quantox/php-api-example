@@ -5,7 +5,14 @@ namespace PhpApi\Api;
 use PhpApi\Db\Person\PersonRepository;
 
 class PersonController {
-    public function exec($requestMethod, $personId) {
+    private PersonRepository $repository;
+
+    public function __construct($connection) {
+        $this->repository = new PersonRepository($connection);
+    }
+
+    public function exec($requestMethod, $personId): void
+    {
         switch ($requestMethod) {
             case "GET":
                 if ($personId)
@@ -24,21 +31,21 @@ class PersonController {
         }
     }
 
-    private function getByIdResponse($personId) {
-        $person = PersonRepository::getById($personId);
+    private function getByIdResponse($personId): void {
+        $person = $this->repository->getById($personId);
 
         header("HTTP/1.1 200 OK");
         echo json_encode($person);
     }
 
-    private function getAllResponse() {
-        $all = PersonRepository::getAll();
+    private function getAllResponse(): void {
+        $all = $this->repository->getAll();
 
         header("HTTP/1.1 200 OK");
         echo json_encode($all);
     }
 
-    private function notFoundResponse() {
+    private function notFoundResponse(): void {
         header("HTTP/1.1 404 Not Found");
     }
 }

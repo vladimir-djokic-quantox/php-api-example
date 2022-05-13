@@ -6,7 +6,7 @@ use \PDO;
 use \PDOException;
 
 class Database {
-    private $connection;
+    private PDO $connection;
 
     public function __construct() {
         $host = $_ENV["DB_HOST"];
@@ -14,6 +14,9 @@ class Database {
         $db = $_ENV["DB_NAME"];
         $user = $_ENV["DB_USERNAME"];
         $pass = $_ENV["DB_PASSWORD"];
+
+        if (!isset($host) || !isset($port) || !isset($db) || !isset($user) || !isset($pass))
+            exit("Environment variables not set!".PHP_EOL);
 
         try {
             $this->connection = new PDO(
@@ -26,7 +29,7 @@ class Database {
         }
     }
 
-    public function getConnection() {
+    public function getConnection(): PDO {
         return $this->connection;
     }
 }
